@@ -1,5 +1,5 @@
 Batch-checkbox-assistant
-批量答题助手 – 一键提取题目、调用 AI、自动勾选答案
+批量答题助手 – 一键提取题目、截图、根据json自动勾选答案
 
 本代码由 heichengljy 与 AI 合作完成
 
