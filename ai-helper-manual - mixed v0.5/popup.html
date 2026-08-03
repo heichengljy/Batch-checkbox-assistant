@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    body {
+      width: 360px;
+      background: #f5f7fa;
+      color: #333;
+      font-size: 13px;
+      display: flex;
+      flex-direction: column;
+      padding: 12px 16px;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #e4e7ed;
+      flex-shrink: 0;
+    }
+    .title {
+      font-size: 15px;
+      font-weight: 600;
+      line-height: 1.4;
+    }
+    .title small {
+      display: block;
+      font-size: 11px;
+      color: #909399;
+      font-weight: 400;
+      margin-top: 2px;
+    }
+    .settings-btn {
+      padding: 4px 10px;
+      border: 1px solid #dcdfe6;
+      border-radius: 4px;
+      background: #fff;
+      cursor: pointer;
+      font-size: 12px;
+      transition: all 0.2s;
+    }
+    .settings-btn:hover:not(:disabled) {
+      border-color: #409eff;
+      color: #409eff;
+    }
+    .settings-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      border-color: #c0c4cc;
+      color: #c0c4cc;
+      transition: none;
+    }
+    .settings-btn:disabled:hover {
+      border-color: #c0c4cc;
+      color: #c0c4cc;
+      background: #fff;
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .scroll-wrap {
+      height: 348px;
+      overflow: hidden;
+      position: relative;
+      flex-shrink: 0;
+    }
+    .main-content, .settings-panel {
+      width: 100%;
+      height: 100%;
+      overflow-y: auto;
+      transition: opacity 0.3s ease;
+      position: absolute;
+      top: 0;
+      left: 0;
+      padding-right: 4px;
+    }
+    .hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .fade-out {
+      opacity: 0;
+    }
+    .step {
+      margin-bottom: 12px;
+      background: #fff;
+      padding: 10px 12px;
+      border-radius: 6px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+    .step:last-child {
+      margin-bottom: 0;
+    }
+    .step-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .step-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom:6px;
+    }
+    .step-title {
+      font-weight: 600;
+      font-size: 13px;
+    }
+    .step-status {
+      font-size: 12px;
+    }
+    .step-status.success { color: #67c23a; }
+    .step-status.fail { color: #f56c6c; }
+    .step-btn {
+      padding: 4px 8px;
+      border: none;
+      border-radius: 4px;
+      background: #409eff;
+      color: #fff;
+      cursor: pointer;
+      font-size: 12px;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+    .step-btn:hover:not(.disabled):not(.error):not(.success-yellow):not(.done) {
+      background: #66b1ff;
+    }
+    .step-btn.done {
+      background: #67c23a !important;
+    }
+    .step-btn.done:hover {
+      background: #67c23a !important;
+    }
+    .step-btn.executing {
+      background: #e6a23c;
+    }
+    .step-btn.executing:hover {
+      background: #e6a23c !important;
+      cursor: pointer;
+    }
+    #screenshotBtn.executing,
+    #screenshotBtn.executing:hover {
+      background: #e6a23c !important;
+      cursor: pointer;
+    }
+    .step-btn.error {
+      background: #f56c6c !important;
+    }
+    .step-btn.error:hover {
+      background: #f56c6c !important;
+    }
+    .step-btn.success-yellow {
+      background: #e6a23c !important;
+    }
+    .step-btn.success-yellow:hover {
+      background: #e6a23c !important;
+    }
+    .step-btn.disabled {
+      background: #c0c4cc;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+    #questionCount {
+      font-weight: 600;
+      color: #409eff;
+    }
+    #aiResponse {
+      width: 100%;
+      height: 100px;
+      padding: 6px;
+      border: 1px solid #dcdfe6;
+      border-radius: 4px;
+      font-size: 12px;
+      resize: none;
+      font-family: inherit;
+      margin:0;
+    }
+    #aiResponse[disabled] {
+      background: #f5f7fa;
+      cursor: not-allowed;
+      border-color: #ddd;
+      color: #aaa;
+      pointer-events: none;
+      user-select: none;
+    }
+    #status {
+      font-size: 12px;
+      margin-top: 4px;
+      min-height: 16px;
+    }
+    .bottom-area {
+      flex-shrink: 0;
+      margin-top: 12px;
+    }
+    #logToggle {
+      width: 100%;
+      padding: 4px;
+      border: 1px solid #dcdfe6;
+      border-radius: 4px;
+      background: #fff;
+      cursor: pointer;
+      font-size: 12px;
+      color: #606266;
+    }
+    #logToggle.disabled {
+      background: #f5f7fa;
+      cursor: not-allowed;
+      color: #c0c4cc;
+      pointer-events: none;
+    }
+    #logContainer {
+      height: 0;
+      overflow-y: auto;
+      margin-top: 6px;
+      background: #fff;
+      border: 1px solid #e4e7ed;
+      border-radius: 4px;
+      padding: 0 6px;
+      font-size: 11px;
+      line-height: 1.5;
+      transition: height 0.3s ease;
+    }
+    #logContainer.open {
+      height: 100px;
+      padding: 6px;
+    }
+    .log-entry {
+      margin-bottom: 2px;
+      color: #606266;
+    }
+    .footer {
+      text-align: center;
+      font-size: 10px;
+      color: #909399;
+      margin-top: 10px;
+      padding-top: 8px;
+      border-top: 1px solid #e4e7ed;
+    }
+
+    .settings-panel h3 {
+      font-size: 14px;
+      margin-bottom: 10px;
+      color: #303133;
+    }
+    .tab-nav {
+      display: flex;
+      border-bottom: 1px solid #dcdfe6;
+      margin-bottom: 12px;
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 6px 0;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      font-size: 13px;
+      color: #606266;
+      transition: all 0.2s;
+      outline: none;
+    }
+    .tab-btn:hover {
+      color: #409eff;
+    }
+    .tab-btn.active {
+      color: #409eff;
+      border-bottom-color: #409eff;
+      font-weight: 600;
+    }
+    .tab-content {
+      height: calc(100% - 60px);
+      overflow-y: auto;
+    }
+    .tab-pane {
+      display: none;
+    }
+    .tab-pane.active {
+      display: block;
+    }
+
+    .setting-group {
+      margin-bottom: 16px;
+      background: #fff;
+      padding: 10px 12px;
+      border-radius: 6px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+    .setting-group > label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-size: 13px;
+    }
+    .delay-options {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .delay-options label {
+      flex: 1;
+      min-width: 50px;
+      padding: 5px 0;
+      text-align: center;
+      border: 1px solid #dcdfe6;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      transition: all 0.2s;
+    }
+    .delay-options input[type="radio"] {
+      display: none;
+    }
+    .delay-options label:has(input:checked) {
+      border-color: #409eff;
+      background: #ecf5ff;
+      color: #409eff;
+    }
+    .prompt-label {
+      font-size: 12px;
+      color: #606266;
+      margin-bottom: 4px;
+      display: block;
+    }
+    .prompt-input {
+      width: 100%;
+      padding: 6px;
+      border: 1px solid #dcdfe6;
+      border-radius: 4px;
+      font-size: 12px;
+      resize: vertical;
+      margin-bottom: 8px;
+      font-family: inherit;
+    }
+    .setting-tip {
+      font-size: 11px;
+      color: #909399;
+      line-height: 1.4;
+      margin-top: 4px;
+    }
+    .reset-btn {
+      width: 100%;
+      padding: 6px;
+      border: 1px solid #f56c6c;
+      border-radius: 4px;
+      background: #fff;
+      color: #f56c6c;
+      cursor: pointer;
+      font-size: 12px;
+      transition: all 0.2s;
+    }
+    .reset-btn:hover {
+      background: #fef0f0;
+    }
+    .helper-text {
+      font-size: 12px;
+      color: #909399;
+    }
+    .screenshot-info {
+      color: #606266;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+    .screenshot-info p {
+      margin-bottom: 6px;
+    }
+    .delay-tip {
+      font-size: 11px;
+      color: #909399;
+      margin-top: 4px;
+      min-height: 18px;
+    }
+    .delay-tip.warn { color: #e6a23c; }
+    .delay-tip.danger { color: #f56c6c; }
+    .delay-tip.success { color: #67c23a; }
+    .ratio-input-group {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 8px;
+    }
+    .ratio-input-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .ratio-input-item label {
+      font-size: 12px;
+      color: #606266;
+    }
+    .ratio-input-item input[type="number"] {
+      width: 60px;
+      padding: 4px 6px;
+      border: 1px solid #dcdfe6;
+      border-radius: 4px;
+      font-size: 12px;
+      text-align: center;
+    }
+    .ratio-input-item input[type="number"]:focus {
+      outline: none;
+      border-color: #409eff;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="title">
+      🤖 批量答题助手
+      <small>For study only. Prohibit cheating.</small>
+    </div>
+    <button class="settings-btn" id="settingsBtn">⚙️ 设置</button>
+  </div>
+
+  <div class="scroll-wrap">
+    <div class="main-content" id="mainContent">
+      <div class="step">
+        <div class="step-row">
+          <span class="step-title">第 1 步：检测页面支持</span>
+          <span class="step-status" id="supportStatus">检测中...</span>
+        </div>
+        <div id="status"></div>
+      </div>
+
+      <div class="step">
+        <div class="step-row">
+          <span class="step-title">第 2 步：将提示词和题目喂给AI</span>
+          <button class="step-btn disabled" id="copyPromptBtn">点击复制</button>
+        </div>
+        <div class="step-row" style="margin-top: 4px;">
+          <span class="helper-text">或者：仅复制提示词模板</span>
+          <button class="step-btn disabled" id="copyTemplateBtn">仅提示词</button>
+        </div>
+        <div class="step-row" style="margin-top: 4px;">
+          <span class="helper-text">小工具：长截图当前页面至剪贴板</span>
+          <button class="step-btn" id="screenshotBtn">截图保存</button>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-title-row">
+          <span class="step-title">第 3 步：粘贴AI返回的指令并运行</span>
+          <button class="step-btn disabled" id="executeBtn">立即执行</button>
+        </div>
+        <textarea id="aiResponse" placeholder='例如：{"1":"B","2":["A","C"]}'></textarea>
+      </div>
+    </div>
+
+    <div class="settings-panel hidden" id="settingsPanel">
+      <div class="tab-nav">
+        <button class="tab-btn active" data-tab="core">核心设置</button>
+        <button class="tab-btn" data-tab="screenshot">截图设置</button>
+      </div>
+      <div class="tab-content">
+        <div class="tab-pane active" id="tab-core">
+          <div class="setting-group">
+            <label>选项点击间隔</label>
+            <div class="delay-options">
+              <label><input type="radio" name="delay" value="1"><span>1ms</span></label>
+              <label><input type="radio" name="delay" value="3"><span>3ms</span></label>
+              <label><input type="radio" name="delay" value="10"><span>10ms</span></label>
+              <label><input type="radio" name="delay" value="25" checked><span>25ms</span></label>
+              <label><input type="radio" name="delay" value="70"><span>70ms</span></label>
+            </div>
+            <div class="setting-tip">数值越大点击越稳定，执行速度越慢</div>
+          </div>
+          <div class="setting-group">
+            <label>自定义AI提示词（实验功能）</label>
+            <span class="prompt-label">题目前的提示词</span>
+            <textarea class="prompt-input" id="promptPrefix" style="height: 140px;"></textarea>
+            <span class="prompt-label">题目后的提示词</span>
+            <textarea class="prompt-input" id="promptSuffix" style="height: 55px;"></textarea>
+            <div class="setting-tip">修改后自动生效，复制按钮将使用自定义文案</div>
+          </div>
+          <button class="reset-btn" id="resetBtn">恢复默认设置</button>
+        </div>
+
+        <div class="tab-pane" id="tab-screenshot">
+          <div class="setting-group">
+            <label>截图间隔</label>
+            <div class="delay-options" id="screenshotDelayGroup">
+              <!-- 修改：将50ms改为"最快"（值仍为50），100ms改为200ms -->
+              <label><input type="radio" name="screenshotDelay" value="50"><span>最快</span></label>
+              <label><input type="radio" name="screenshotDelay" value="200"><span>200ms</span></label>
+              <label><input type="radio" name="screenshotDelay" value="500" checked><span>500ms</span></label>
+              <label><input type="radio" name="screenshotDelay" value="800"><span>800ms</span></label>
+              <label><input type="radio" name="screenshotDelay" value="1200"><span>1200ms</span></label>
+            </div>
+            <div id="screenshotDelayTip" class="delay-tip success">✅ 标准速度</div>
+          </div>
+
+          <div class="setting-group">
+            <label>📐 裁剪范围（起始线 / 步长线）</label>
+            <div class="ratio-input-group">
+              <div class="ratio-input-item">
+                <label for="startRatioInput">起始线</label>
+                <input type="number" id="startRatioInput" min="0" max="100" value="20" step="1">
+                <span>%</span>
+              </div>
+              <div class="ratio-input-item">
+                <label for="endRatioInput">步长线</label>
+                <input type="number" id="endRatioInput" min="0" max="100" value="80" step="1">
+                <span>%</span>
+              </div>
+            </div>
+            <div class="screenshot-info">
+              <p><strong>起始线（红色）：</strong>视口顶部向下 <span id="startRatioDisplay">20%</span></p>
+              <p><strong>步长线（蓝色）：</strong>视口顶部向下 <span id="endRatioDisplay">80%</span></p>
+              <p><strong>步长（间距）：</strong><span id="stepDisplay">60%</span> 视口高度</p>
+              <p style="margin-top: 8px; color: #909399;">* 切换到此选项卡时会在页面上绘制对应辅助线。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom-area">
+    <button id="logToggle">▼ 展开日志</button>
+    <div id="logContainer"></div>
+    <div class="footer">
+      Powered by HeiCheng. All rights reserved.
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
