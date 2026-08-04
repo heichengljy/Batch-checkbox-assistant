@@ -3,6 +3,8 @@ Batch-checkbox-assistant
 
 本代码由 heichengljy 与 AI 合作完成
 
+介绍视频链接https://www.bilibili.com/video/BV1ciMR62EaA
+
 📌 简介
 Batch-checkbox-assistant 是一款浏览器扩展，专为在线考试/练习页面设计。
 它能够自动识别学习通（超星）考试界面和通用复选框/单选框页面，
