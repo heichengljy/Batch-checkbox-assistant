@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "快速答题助手",
+  "version": "1.0",
+  "description": "支持学习通考试页面与通用复选框页面的快速提取页面信息，自动识别页面类型，一键填充选项",
+  "permissions": ["activeTab", "scripting", "storage", "clipboardWrite"],
+  "host_permissions": ["<all_urls>"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icon.png",
+      "48": "icon.png",
+      "128": "icon.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
