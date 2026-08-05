@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    /* ===== Light Mode 均衡明度高端配色 ===== */
+    :root {
+      /* 背景层级：由深至浅，低反光柔和基底 */
+      --bg-primary: #F4F7FB;
+      --bg-secondary: #FFFFFF;
+      --bg-card: #FFFFFF;
+      --bg-input: #FFFFFF;
+      --bg-input-disabled: #E9EEF6;
+      --bg-hover: #F0F5FD;
+      --bg-elevated: #FFFFFF;
+      /* 文字梯度，非纯黑，柔和高对比 */
+      --text-primary: #141A28;
+      --text-secondary: #566078;
+      --text-muted: #5b6b9B;
+      --text-inverse: #FFFFFF;
+      /* 边框分割低对比度，弱化割裂感 */
+      --border-color: #D2D9E8;
+      --border-light: #EDF2FB;
+      --border-dark: #C1CCE0;
+      --shadow-card: 0 1px 3px rgba(10, 30, 80, 0.05);
+      /* 功能色 浅色版：中明度低饱和，感官重量适中 */
+      --btn-primary: #006ED8;
+      --btn-primary-hover: #005BB3;
+      --btn-success: #27A856;
+      --btn-warning: #E68200;
+      --btn-danger: #E03131;
+      --btn-disabled: #B4BFD3;
+      --link-color: #006ED8;
+      --tab-active-color: #006ED8;
+      --input-border: #D2D9E8;
+      --input-text: #141A28;
+      --input-placeholder: #949FB8;
+      --log-bg: #FFFFFF;
+      --log-border: #EDF2FB;
+      --log-text: #566078;
+      --footer-border: #EDF2FB;
+      --footer-text: #949FB8;
+      --status-success: #27A856;
+      --status-fail: #E03131;
+      --delay-tip-warn: #E68200;
+      --delay-tip-danger: #E03131;
+      --delay-tip-success: #27A856;
+      --mask-bg-start: rgba(244, 247, 251, 0);
+      --mask-bg-end: rgba(244, 247, 251, 0.95);
+    }
+    /* ===== Dark Mode 同色相明度均衡深色配色 ===== */
+    .dark-mode {
+      /* 三层灰度分层替代阴影，高端哑光质感 */
+      --bg-primary: #121212;
+      --bg-secondary: #1A1A24;
+      --bg-card: #1A1A24;
+      --bg-input: #1A1A24;
+      --bg-input-disabled: #242434;
+      --bg-hover: #242434;
+      --bg-elevated: #2C2C3F;
+      /* 文字透明度严格遵循HIG规范 */
+      --text-primary: rgba(240, 244, 255, 0.87);
+      --text-secondary: rgba(200, 210, 230, 0.62);
+      --text-muted: rgba(150, 165, 190, 0.78);
+      --text-inverse: #121212;
+      /* 半透明边框，无厚重分割 */
+      --border-color: rgba(255, 255, 255, 0.10);
+      --border-light: rgba(255, 255, 255, 0.06);
+      --border-dark: rgba(255, 255, 255, 0.18);
+      --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.45);
+      /* 深色功能色：色相不变、降饱和、对齐浅色视觉重量 */
+      --btn-primary: #2387FF;
+      --btn-primary-hover: #409CFF;
+      --btn-success: #34C066;
+      --btn-warning: #FFB726;
+      --btn-danger: #FF4F4F;
+      --btn-disabled: #2C2C3F;
+      --link-color: #2387FF;
+      --tab-active-color: #2387FF;
+      --input-border: rgba(255, 255, 255, 0.10);
+      --input-text: rgba(240, 244, 255, 0.87);
+      --input-placeholder: rgba(150, 165, 190, 0.38);
+      --log-bg: #1A1A24;
+      --log-border: rgba(255, 255, 255, 0.06);
+      --log-text: rgba(200, 210, 230, 0.62);
+      --footer-border: rgba(255, 255, 255, 0.06);
+      --footer-text: rgba(150, 165, 190, 0.38);
+      --status-success: #34C066;
+      --status-fail: #FF4F4F;
+      --delay-tip-warn: #FFB726;
+      --delay-tip-danger: #FF4F4F;
+      --delay-tip-success: #34C066;
+      --mask-bg-start: rgba(18, 18, 18, 0);
+      --mask-bg-end: rgba(18, 18, 18, 0.95);
+    }
+    /* ========== 主题切换过渡动画 ========== */
+    body.theme-transition {
+      transition: background-color 0.4s ease,
+                  color 0.4s ease,
+                  border-color 0.4s ease,
+                  box-shadow 0.4s ease;
+    }
+    body.theme-transition * {
+      transition: background-color 0.4s ease,
+                  color 0.4s ease,
+                  border-color 0.4s ease,
+                  box-shadow 0.4s ease;
+    }
+    /* ========== 通用布局样式（完全保留原版结构） ========== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    body {
+      width: 360px;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-size: 13px;
+      display: flex;
+      flex-direction: column;
+      padding: 12px 16px;
+      transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-light);
+      flex-shrink: 0;
+      transition: border-color 0.4s ease;
+    }
+    .title {
+      font-size: 15px;
+      font-weight: 600;
+      line-height: 1.4;
+    }
+    .title small {
+      display: block;
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 400;
+      margin-top: 2px;
+      transition: color 0.4s ease;
+    }
+    .settings-btn {
+      padding: 4px 10px;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      cursor: pointer;
+      font-size: 12px;
+      transition: all 0.2s, background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease;
+    }
+    .settings-btn:hover:not(:disabled) {
+      border-color: var(--link-color);
+      color: var(--link-color);
+    }
+    .settings-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      border-color: var(--border-dark);
+      color: var(--text-muted);
+      transition: none;
+    }
+    .settings-btn:disabled:hover {
+      border-color: var(--border-dark);
+      color: var(--text-muted);
+      background: var(--bg-secondary);
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .scroll-wrap {
+      height: 345px;
+      overflow: hidden;
+      position: relative;
+      flex-shrink: 0;
+    }
+    .main-content,
+    .settings-panel {
+      width: 100%;
+      height: 100%;
+      overflow-y: auto;
+      transition: opacity 0.3s ease;
+      position: absolute;
+      top: 0;
+      left: 0;
+      padding-right: 4px;
+    }
+    .hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .fade-out {
+      opacity: 0;
+    }
+    .step {
+      margin-bottom: 12px;
+      background: var(--bg-card);
+      padding: 10px 12px;
+      border-radius: 6px;
+      box-shadow: var(--shadow-card);
+      transition: background-color 0.4s ease, box-shadow 0.4s ease;
+    }
+    .step:last-child {
+      margin-bottom: 0;
+    }
+    .step-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .step-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+    .step-title {
+      font-weight: 600;
+      font-size: 13px;
+    }
+    .step-status {
+      font-size: 12px;
+    }
+    .step-status.success {
+      color: var(--status-success);
+    }
+    .step-status.fail {
+      color: var(--status-fail);
+    }
+    .step-btn {
+      padding: 4px 8px;
+      border: none;
+      border-radius: 4px;
+      background: var(--btn-primary);
+      color: #fff;
+      cursor: pointer;
+      font-size: 12px;
+      transition: background 0.2s, background-color 0.4s ease;
+      white-space: nowrap;
+    }
+    .step-btn:hover:not(.disabled):not(.error):not(.success-y):not(.done) {
+      background: var(--btn-primary-hover);
+    }
+    .step-btn.done {
+      background: var(--btn-success) !important;
+    }
+    .step-btn.done:hover {
+      background: var(--btn-success) !important;
+    }
+    .step-btn.executing {
+      background: var(--btn-warning);
+    }
+    .step-btn.executing:hover {
+      background: var(--btn-warning) !important;
+      cursor: pointer;
+    }
+    #screenshotBtn.executing,
+    #screenshotBtn.executing:hover {
+      background: var(--btn-warning) !important;
+      cursor: pointer;
+    }
+    .step-btn.error {
+      background: var(--btn-danger) !important;
+    }
+    .step-btn.error:hover {
+      background: var(--btn-danger) !important;
+    }
+    .step-btn.success-yellow {
+      background: var(--btn-warning) !important;
+    }
+    .step-btn.success-yellow:hover {
+      background: var(--btn-warning) !important;
+    }
+    .step-btn.disabled {
+      background: var(--btn-disabled);
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+    #questionCount {
+      font-weight: 600;
+      color: var(--link-color);
+      transition: color 0.4s ease;
+    }
+    #aiResponse {
+      width: 100%;
+      height: 100px;
+      padding: 6px;
+      border: 1px solid var(--input-border);
+      border-radius: 4px;
+      font-size: 12px;
+      resize: none;
+      font-family: inherit;
+      margin: 0;
+      background: var(--bg-secondary);
+      color: var(--input-text);
+      transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease;
+    }
+    #aiResponse::placeholder {
+    color: var(--text-muted);
+    opacity: 1;
+    }
+    #aiResponse[disabled] {
+      background: var(--bg-input-disabled);
+      cursor: not-allowed;
+      border-color: var(--border-dark);
+      color: var(--text-muted);
+      pointer-events: none;
+      user-select: none;
+    }
+    #status {
+    font-size: 12px;
+    margin-top: 4px;
+    min-height: 16px;
+    transition: none;
+}
+    .bottom-area {
+      flex-shrink: 0;
+      margin-top: 12px;
+    }
+    #logToggle {
+      width: 100%;
+      padding: 4px;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      background: var(--bg-secondary);
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-size: 12px;
+      transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease;
+    }
+    #logToggle.disabled {
+      background: var(--bg-input-disabled);
+      cursor: not-allowed;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+    #logContainer {
+      height: 0;
+      overflow-y: auto;
+      margin-top: 6px;
+      background: var(--log-bg);
+      border: 1px solid var(--log-border);
+      border-radius: 4px;
+      padding: 0 6px;
+      font-size: 11px;
+      line-height: 1.5;
+      transition: height 0.3s ease, background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      color: var(--log-text);
+    }
+    #logContainer::-webkit-scrollbar {
+      display: none;
+    }
+    #logContainer.open {
+      height: 100px;
+      padding: 6px;
+    }
+    .log-entry {
+      margin-bottom: 2px;
+    }
+    .footer {
+      text-align: center;
+      font-size: 10px;
+      color: var(--footer-text);
+      margin-top: 10px;
+      padding-top: 8px;
+      border-top: 1px solid var(--footer-border);
+      transition: color 0.4s ease, border-color 0.4s ease;
+    }
+    .settings-panel h3 {
+      font-size: 14px;
+      margin-bottom: 10px;
+      color: var(--text-primary);
+      transition: color 0.4s ease;
+    }
+    .tab-nav {
+      display: flex;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 12px;
+      transition: border-color 0.4s ease;
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 6px 0;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--text-secondary);
+      transition: all 0.2s, color 0.4s ease, border-color 0.4s ease;
+      outline: none;
+    }
+    .tab-btn:hover {
+      color: var(--link-color);
+    }
+    .tab-btn.active {
+      color: var(--tab-active-color);
+      border-bottom-color: var(--tab-active-color);
+      font-weight: 600;
+    }
+    .tab-content {
+      height: calc(100% - 48px);
+      overflow-y: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      position: relative;
+    }
+    .tab-content::-webkit-scrollbar {
+      width: 0;
+      background: transparent;
+    }
+    .tab-mask {
+      position: sticky;
+      bottom: 0;
+      height: 60px;
+      background: linear-gradient(to bottom, var(--mask-bg-start), var(--mask-bg-end));
+      pointer-events: none;
+      z-index: 1;
+      margin-top: -60px;
+      transition: background 0.4s ease;
+    }
+    .tab-pane {
+      display: none;
+    }
+    .tab-pane.active {
+      display: block;
+    }
+    .setting-group {
+      margin-bottom: 16px;
+      background: var(--bg-card);
+      padding: 10px 12px;
+      border-radius: 6px;
+      box-shadow: var(--shadow-card);
+      transition: background-color 0.4s ease, box-shadow 0.4s ease;
+    }
+    .setting-group > label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-size: 13px;
+      color: var(--text-primary);
+      transition: color 0.4s ease;
+    }
+    .delay-options {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .delay-options label {
+      flex: 1;
+      min-width: 50px;
+      padding: 5px 0;
+      text-align: center;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      transition: all 0.2s, background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease;
+      background: var(--bg-secondary);
+      color: var(--text-secondary);
+    }
+    .delay-options input[type="radio"] {
+      display: none;
+    }
+    .delay-options label:has(input:checked) {
+      border-color: var(--link-color);
+      background: var(--bg-hover);
+      color: var(--link-color);
+    }
+    .prompt-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+      display: block;
+      transition: color 0.4s ease;
+    }
+    .prompt-input {
+      width: 100%;
+      padding: 6px;
+      border: 1px solid var(--input-border);
+      border-radius: 4px;
+      font-size: 12px;
+      resize: vertical;
+      margin-bottom: 8px;
+      font-family: inherit;
+      background: var(--bg-secondary);
+      color: var(--input-text);
+      transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease;
+    }
+    .setting-tip {
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.4;
+      margin-top: 4px;
+      transition: color 0.4s ease;
+    }
+    .reset-btn {
+      width: 100%;
+      padding: 6px;
+      border: 1px solid var(--btn-danger);
+      border-radius: 4px;
+      background: var(--bg-secondary);
+      color: var(--btn-danger);
+      cursor: pointer;
+      font-size: 12px;
+      transition: all 0.2s, background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease;
+    }
+    .reset-btn:hover {
+      background: var(--bg-hover);
+    }
+    .helper-text {
+      font-size: 12px;
+      color: var(--text-muted);
+      transition: color 0.4s ease;
+    }
+    .screenshot-info {
+      color: var(--text-secondary);
+      font-size: 12px;
+      line-height: 1.6;
+      transition: color 0.4s ease;
+    }
+    .screenshot-info p {
+      margin-bottom: 6px;
+    }
+    .delay-tip {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 4px;
+      min-height: 18px;
+      transition: color 0.4s ease;
+    }
+    .delay-tip.warn {
+      color: var(--delay-tip-warn);
+    }
+    .delay-tip.danger {
+      color: var(--delay-tip-danger);
+    }
+    .delay-tip.success {
+      color: var(--delay-tip-success);
+    }
+    /* 比例行布局（5列均分） */
+    .ratio-row {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      align-items: center;
+      justify-items: center;
+      margin-bottom: 6px;
+      gap: 2px;
+    }
+    .ratio-btn {
+      width: 24px;
+      height: 24px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-secondary);
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 14px;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      transition: all 0.2s, background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease;
+    }
+    .ratio-btn:hover {
+      border-color: var(--link-color);
+      background: var(--bg-hover);
+    }
+    .ratio-btn:disabled {
+      color: var(--text-muted);
+      cursor: not-allowed;
+      background: var(--bg-input-disabled);
+    }
+    /* 截图辅助线固定功能色（不随主题明度调整，保证识别） */
+    .ratio-btn[data-target="startRatio"] { color: #ff0000; }
+    .ratio-btn[data-target="endRatio"] { color: #0066ff; }
+    .ratio-btn[data-target="leftRatio"] { color: #cc9900; }
+    .ratio-btn[data-target="rightRatio"] { color: #008800; }
+    .ratio-btn[data-target="startRatio"]:hover:not(:disabled) { color: #ff3333; }
+    .ratio-btn[data-target="endRatio"]:hover:not(:disabled) { color: #3388ff; }
+    .ratio-btn[data-target="leftRatio"]:hover:not(:disabled) { color: #e6b800; }
+    .ratio-btn[data-target="rightRatio"]:hover:not(:disabled) { color: #00aa00; }
+    .ratio-btn[data-target="startRatio"]:disabled { color: #ff9999; }
+    .ratio-btn[data-target="endRatio"]:disabled { color: #99bbff; }
+    .ratio-btn[data-target="leftRatio"]:disabled { color: #e6cc99; }
+    .ratio-btn[data-target="rightRatio"]:disabled { color: #99cc99; }
+    /* 辅助线标签文字 */
+    .left-text { color: #cc9900; font-weight: 600; }
+    .right-text { color: #008800; font-weight: 600; }
+    .start-text { color: #ff0000; font-weight: 600; }
+    .end-text { color: #0066ff; font-weight: 600; }
+    .val-text {
+      font-weight: 600;
+      font-size: 14px;
+      min-width: 32px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body class="dark-mode">
+  <!-- 主界面结构完全原版无修改 -->
+  <div class="header">
+    <div class="title">
+      🤖 批量答题助手
+      <small>For study only. Prohibit cheating.</small>
+    </div>
+    <button class="settings-btn" id="settingsBtn">⚙️ 设置</button>
+  </div>
+  <div class="scroll-wrap">
+    <div class="main-content" id="mainContent">
+      <!-- 第 1 步：检测页面支持 -->
+      <div class="step">
+        <div class="step-row">
+          <span class="step-title">第 1 步：检测页面支持</span>
+          <span class="step-status" id="supportStatus" style="display:none;"></span>
+        </div>
+        <div id="status" style="opacity:0; min-height:16px;"></div>   <!-- 初始隐藏 -->
+      </div>
+      <div class="step">
+        <div class="step-row">
+          <span class="step-title">第 2 步：将提示词和题目喂给AI</span>
+          <button class="step-btn disabled" id="copyPromptBtn">点击复制</button>
+        </div>
+        <div class="step-row" style="margin-top: 4px;">
+          <span class="helper-text">或者：仅复制提示词</span>
+          <button class="step-btn disabled" id="copyTemplateBtn">仅提示词</button>
+        </div>
+        <div class="step-row" style="margin-top: 4px;">
+          <span class="helper-text">小工具：长截图当前页面至剪贴板</span>
+          <button class="step-btn" id="screenshotBtn">截图保存</button>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-title-row">
+          <span class="step-title">第 3 步：粘贴AI返回的指令并运行</span>
+          <button class="step-btn disabled" id="executeBtn">立即执行</button>
+        </div>
+        <textarea id="aiResponse" placeholder='例如：{"1":"B","2":["A","C"]}'></textarea>
+      </div>
+    </div>
+    <div class="settings-panel hidden" id="settingsPanel">
+      <div class="tab-nav">
+        <button class="tab-btn active" data-tab="core">核心设置</button>
+        <button class="tab-btn" data-tab="screenshot">截图设置</button>
+      </div>
+      <div class="tab-content">
+        <div class="tab-pane active" id="tab-core">
+          <div class="setting-group">
+            <label>选项点击间隔</label>
+            <div class="delay-options">
+              <label><input type="radio" name="delay" value="1"><span>1ms</span></label>
+              <label><input type="radio" name="delay" value="3"><span>3ms</span></label>
+              <label><input type="radio" name="delay" value="10"><span>10ms</span></label>
+              <label><input type="radio" name="delay" value="25" checked><span>25ms</span></label>
+              <label><input type="radio" name="delay" value="70"><span>70ms</span></label>
+            </div>
+            <div class="setting-tip">数值越大点击越稳定，执行速度越慢</div>
+          </div>
+          <div class="setting-group">
+            <label>自定义AI提示词</label>
+            <span class="prompt-label">题目前的提示词</span>
+            <textarea class="prompt-input" id="promptPrefix" style="height: 140px;"></textarea>
+            <span class="prompt-label">题目后的提示词</span>
+            <textarea class="prompt-input" id="promptSuffix" style="height: 55px;"></textarea>
+            <div class="setting-tip">修改后自动生效，复制按钮将使用自定义文案</div>
+          </div>
+          <div class="setting-group">
+            <label>主题模式</label>
+            <div class="delay-options" id="themeOptions">
+              <label><input type="radio" name="theme" value="system" checked><span>跟随系统</span></label>
+              <label><input type="radio" name="theme" value="dark"><span>深色</span></label>
+              <label><input type="radio" name="theme" value="light"><span>浅色</span></label>
+            </div>
+          </div>
+          <button class="reset-btn" id="resetBtn">恢复默认设置</button>
+        </div>
+        <div class="tab-pane" id="tab-screenshot">
+          <div class="setting-group">
+            <label>截图间隔</label>
+            <div class="delay-options" id="screenshotDelayGroup">
+              <label><input type="radio" name="screenshotDelay" value="10"><span>最快</span></label>
+              <label><input type="radio" name="screenshotDelay" value="50"><span>50ms</span></label>
+              <label><input type="radio" name="screenshotDelay" value="160"><span>160ms</span></label>
+              <label><input type="radio" name="screenshotDelay" value="400"><span>400ms</span></label>
+              <label><input type="radio" name="screenshotDelay" value="750"><span>750ms</span></label>
+            </div>
+            <div id="screenshotDelayTip" class="delay-tip success">✅ 标准速度</div>
+          </div>
+          <div class="setting-group">
+            <label>滚动截图边界设置</label>
+            <!-- 第一行：左右边界标签+数值 -->
+            <div class="ratio-row">
+              <span class="left-text">左边线</span>
+              <span class="val-text left-text" id="leftRatioDisplay">0%</span>
+              <span class="right-text">右边线</span>
+              <span class="val-text right-text" id="rightRatioDisplay">100%</span>
+              <span class="val-text">间距</span>
+            </div>
+            <!-- 第二行：左右边界控制按钮 + 间距数值 -->
+            <div class="ratio-row">
+              <button class="ratio-btn up" data-target="leftRatio">←</button>
+              <button class="ratio-btn down" data-target="leftRatio">→</button>
+              <button class="ratio-btn up" data-target="rightRatio">←</button>
+              <button class="ratio-btn down" data-target="rightRatio">→</button>
+              <span class="val-text" id="widthDisplay">100%</span>
+            </div>
+            <!-- 第三行：垂直裁剪文字+向上按钮 -->
+            <div class="ratio-row">
+              <span class="start-text">起始线</span>
+              <button class="ratio-btn up" data-target="startRatio">↑</button>
+              <button class="ratio-btn up" data-target="endRatio">↑</button>
+              <span class="end-text">步长线</span>
+              <span>步长</span>
+            </div>
+            <!-- 第四行：垂直裁剪数值+向下按钮 -->
+            <div class="ratio-row">
+              <span class="val-text start-text" id="startRatioDisplay">20%</span>
+              <button class="ratio-btn down" data-target="startRatio">↓</button>
+              <button class="ratio-btn down" data-target="endRatio">↓</button>
+              <span class="val-text end-text" id="endRatioDisplay">80%</span>
+              <span class="val-text" id="stepDisplay">60%</span>
+            </div>
+            <div class="screenshot-info">
+              <p><strong>*步长</strong>为红蓝线之间的区域，是两次截图跨越的长度。</p>
+            </div>
+          </div>
+        </div>
+        <!-- 固定底部渐变遮罩 -->
+        <div class="tab-mask"></div>
+      </div>
+    </div>
+  </div>
+  <div class="bottom-area">
+    <button id="logToggle">▼ 展开日志</button>
+    <div id="logContainer"></div>
+    <div class="footer">
+      Powered by HeiCheng. All rights reserved.
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
